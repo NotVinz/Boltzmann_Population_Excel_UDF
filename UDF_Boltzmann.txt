@@ -1,0 +1,65 @@
+Function WIP_Boltzmann(input_range As Range) As Double
+    Dim temperature  As Double
+    Dim FROM As String
+    temperature = 298.15
+    Dim kB As Double
+    kB = 0.0000031668 'For energies in Hartree (a.u.)
+
+' Useful aliases
+    caller_row = Application.Caller.Row
+    caller_column = Application.Caller.Column
+    MinEnergy = Application.WorksheetFunction.Min(input_range) 'Lowest energy
+    first_cell = input_range.Cells(1).Address
+    first_row = input_range.Cells(1).Row
+    first_column = input_range.Cells(1).Column
+    last_row = input_range.Cells(input_range.Cells.Count).Row
+    last_column = input_range.Cells(input_range.Cells.Count).Column
+    n_rows = last_row - input_range.Cells(1).Row
+    n_rcolumns = last_column - input_range.Cells(1).Column
+ 
+
+ Dim Rel_En() As Variant       'Relative energies matrix; prevents overflow in the next stages, involving logarithms
+ ReDim Rel_En(n_rows, n_rcolumns)
+ For i = 0 To n_rcolumns
+    For j = 0 To n_rows
+        Rel_En(j, i) = Cells(input_range.Cells(1).Row + j, input_range.Cells(1).Column + i) - MinEnergy
+    Next j
+ Next i
+ 
+ 
+ Factors_Sum = 0
+ Dim Boltz_Factors() As Variant       'Boltzmann factors matrix (f(i) = exp(-E(i)/(K*T))
+ ReDim Boltz_Factors(n_rows, n_rcolumns)
+  For i = 0 To n_rcolumns
+    For j = 0 To n_rows
+        Boltz_Factors(j, i) = Exp(-Rel_En(j, i) / (kB * temperature))
+        Factors_Sum = Factors_Sum + Boltz_Factors(j, i) 'Sum of all factors: SUM=sum(f(i)) for all values of i
+    Next j
+ Next i
+ 
+ For i = 0 To n_rcolumns   'Populations: p(i)=f(i)/SUM
+    For j = 0 To n_rows
+        Boltz_Factors(j, i) = Boltz_Factors(j, i) / Factors_Sum
+    Next j
+ Next i
+ 
+ 
+  For i = 0 To n_rcolumns
+    For j = 0 To n_rows
+           If (i <> 0 Or j <> 0) Then  'edits non-caller cells
+            FROM = CStr(Boltz_Factors(j, i))
+            FROM = Replace(FROM, ",", ".") 'Needed in order to pass a non-integer value to the function
+            Evaluate "Copy_From_To(" & FROM & "," & (Cells(j + caller_row, i + caller_column).Address) & ")"
+        Else
+            WIP_Boltzmann = Boltz_Factors(j, i) 'edits caller cell
+        End If
+    Next j
+ Next i
+End Function
+
+
+
+Private Sub Copy_From_To(Copy_From As String, Copy_FTo As Range)
+    Copy_FTo.Value = CDbl(Copy_From)
+End Sub
+
