@@ -1,0 +1,102 @@
+Function Boltzmann_Pop(input_range As Range, Optional temperature, Optional units) As Double
+    Dim FROM As String
+    If IsMissing(temperature) Then
+        temperature = 298.15
+    End If
+    
+    If IsMissing(units) Then
+        kB = 0.0000031668 'For energies in Hartree (a.u.)
+        Else
+        
+        Select Case units
+    Case "Hartree", "hartree", "Hartrees", "hartrees", "Eh", "eh", "au", "a.u."
+        kB = 0.0000031668
+    Case "kJ/mol", "kj/mol", "kj\mol", "kJ\mol", "kjmol", "KJ/mol"
+        kB = 0.008314463 
+    Case "kcal/mol", "Kcal/mol", "kcalmol", "kcal\mol", "Kcal\mol"
+        kB = 0.001985875
+     Case "ev", "eV", "EV"
+        kB = 0.00008617333262
+    
+End Select
+        
+    End If
+
+' Useful aliases
+    caller_row = Application.Caller.Row
+    caller_column = Application.Caller.Column
+    MinEnergy = Application.WorksheetFunction.Min(input_range) 'Lowest energy
+    first_cell = input_range.Cells(1).Address
+    first_row = input_range.Cells(1).Row
+    first_column = input_range.Cells(1).Column
+    last_row = input_range.Cells(input_range.Cells.Count).Row
+    last_column = input_range.Cells(input_range.Cells.Count).Column
+    n_rows = last_row - input_range.Cells(1).Row
+    n_rcolumns = last_column - input_range.Cells(1).Column
+ 
+
+ Dim Rel_En() As Variant       'Relative energies matrix; prevents overflow in the next stages, involving logarithms
+ ReDim Rel_En(n_rows, n_rcolumns)
+ For i = 0 To n_rcolumns
+    For j = 0 To n_rows
+        Rel_En(j, i) = Cells(input_range.Cells(1).Row + j, input_range.Cells(1).Column + i) - MinEnergy
+    Next j
+ Next i
+ 
+ 
+ Factors_Sum = 0
+ Dim Boltz_Factors() As Variant       'Boltzmann factors matrix (f(i) = exp(-E(i)/(K*T))
+ ReDim Boltz_Factors(n_rows, n_rcolumns)
+  For i = 0 To n_rcolumns
+    For j = 0 To n_rows
+        Boltz_Factors(j, i) = Exp(-Rel_En(j, i) / (kB * temperature))
+        Factors_Sum = Factors_Sum + Boltz_Factors(j, i) 'Sum of all factors: SUM=sum(f(i)) for all values of i
+    Next j
+ Next i
+ 
+ For i = 0 To n_rcolumns   'Populations: p(i)=f(i)/SUM
+    For j = 0 To n_rows
+        Boltz_Factors(j, i) = Boltz_Factors(j, i) / Factors_Sum
+    Next j
+ Next i
+ 
+ 
+  For i = 0 To n_rcolumns
+    For j = 0 To n_rows
+           If (i <> 0 Or j <> 0) Then  'edits non-caller cells
+            FROM = CStr(Boltz_Factors(j, i))
+            FROM = Replace(FROM, ",", ".") 'Needed in order to pass a non-integer value to the function
+            Evaluate "Copy_From_To(" & FROM & "," & (Cells(j + caller_row, i + caller_column).Address(False, False)) & ")"
+        Else
+            Boltzmann_Pop = Boltz_Factors(j, i) 'edits caller cell
+        End If
+    Next j
+ Next i
+ 
+
+ 
+End Function
+
+Private Sub Copy_From_To(Copy_From As String, Copy_To As Range)
+    Copy_To.Value = CDbl(Copy_From) ' writes to target cells
+End Sub
+
+Function Boltzmann_Pop_HELP() As String
+ Boltzmann_Pop_HELP = "Boltzmann_Pop(Cells; temperature ;" & Chr(34) & "units" & Chr(34) & ")" & "  ---  eg: Boltzmann_Pop(A1:A3;298.15;" & Chr(34) & "Hartrees" & Chr(34) & ")   equals   Boltzmann_Pop(A1:A3;;)"
+ 
+ MsgBox ("Usage:" & vbLf & vbLf & "Boltzmann_Pop(Cells; temperature; units)     or" & vbLf & "Boltzmann_Pop(Cells;;)" _
+ & vbLf & vbLf & "Temperature and Units parameters are optional; if they are not expressed, the default values (Hartrees, 298.15) apply." _
+ & vbLf & "Temperatures must be expressed in K." & vbLf & "Energy units can be set to " & Chr(34) & "Hartrees" & Chr(34) & ", " & Chr(34) _
+ & "kJ/mol" & Chr(34) & ", " & Chr(34) & "kcal/mol" & Chr(34) & ", " & Chr(34) & "eV" & Chr(34) & "." & vbLf & vbLf _
+ & "* *INPUT EXAMPLES* *" & vbLf _
+ & "Eg:" & vbLf & "   --->  Boltzmann_Pop(A1:A3;;)" & vbLf & "is equivalent to" & vbLf & "   --->  Boltzmann_Pop(A1:A3;298.15;" & Chr(34) & "Hartrees" & Chr(34) & ")" & vbLf _
+ & "* * * * * * * * * * * * * *" & vbLf _
+ & vbLf & "The function *MUST* be written in a single cell for each series of energies: selection of multiple cells in the input range" _
+ & "results automatically in a multi-cell output, with the cell containing the formula being the top-left cell in the output table." _
+ & vbLf & vbLf & "Input data may be organized in any n*m table (including vertical and horizontal vectors)" _
+ & "; the output structure mirrors the organization of the input structure")
+End Function
+
+
+'Written by Vincenzo Brancaccio, 2020
+'You are free to share, edit, copy, improve or break this code :)
