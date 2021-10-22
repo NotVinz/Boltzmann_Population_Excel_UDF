@@ -1,4 +1,4 @@
-# ## What is this?
+## What is this?
 Just a simple excel function (an UDF, User Defined Function) which allows calculating the Boltzmann population of several energy levels (eg: conformers, spin states, etc).
 
 Once installed, the function can be called just like any other excel function, by digiting *"=Function_Name"*; in this case, *"=Boltzmann_Pop("*
