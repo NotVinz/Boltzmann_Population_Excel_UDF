@@ -1,6 +1,8 @@
 # ## What is this?
 Just a simple excel function (an UDF, User Defined Function) which allows calculating the Boltzmann population of several energy levels (eg: conformers, spin states, etc).
 
+Once installed, the function can be called just like any other excel function, by digiting *"=Function_Name"*; in this case, *"=Boltzmann_Pop("*
+
 The code is mainly intended for use with computational chemistry packages, hence the **default energy units** are **Hartrees** (a.u.), but **kJ/mol**, **kcal/mol**, **eV** can be set easily.
 The default temperature is **298.15** K, but other temperatures can be set easily.
 
@@ -20,18 +22,18 @@ In order to calculate the population at 298.15 K, we start by typing the formula
 
 ![](image/Im2.png)
 
-Note that, while typing, a **HELP function** is displayed. This can be executed if the command syntax is forgotten.
+Note that, while typing, a **HELP function** is displayed. This can be executed if the command syntax is forgotten: the "Help" function displays the following informative window.
 
 ![](image/Im5.png)
 
 By typing
 *=Boltzmann_Pop(Range;;)*
 which is equivalent to:
-*=Boltzmann_Pop(Range;298.15;"Hartrees")*
+*=Boltzmann_Pop(Range;298.15;"Hartrees")*...
 
 ![](image/Im3.png)
 
-The populations of the energy levels in the input range is displayed.
+...the populations of the energy levels in the input range is displayed.
 The obtained values state that at room temperature (in the gas phase) 67% of butane molecules are in *Anti* conformation, and the remaining 33% is in two isoenergetic (ie symmetric, degenerate) *"Gauche"* conformations
 
 ![](image/Im4.png)
