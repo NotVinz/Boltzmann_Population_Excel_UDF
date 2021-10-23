@@ -9,9 +9,19 @@ The default temperature is **298.15** K, but other temperatures can be set easil
 ## Installation
 The function is contained in the Boltzmann_Pop.xlam file.
 
+In Windows, all you have to do is:
+1. Download the file **Boltzmann_Pop.xlam**
+2. Right click on it > Properties; check the "Unblock" box and press OK
+3. Copy the file in %APPDATA%\Microsoft\AddIns (it equals C:\Users\username\AppData\Roaming\Microsoft\AddIns)
+4. Open Excel, go to Options > Add-ins > Go... 
+5. Check Boltzmann_Pop ad press OK
+6. Done! :)
+
 Exhaustive instructions on installing these files can be found online, eg:
+
 https://www.automateexcel.com/vba/install-add-in
 
+https://support.microsoft.com/en-us/office/add-or-remove-add-ins-in-excel-0af570c4-5cf3-4fa9-9b88-403625a0b460
 
 ## Some examples
 We calculated the energies of the three low-energy conformations of butane: two isoenergetic *gauche* and a *trans* conformer.
