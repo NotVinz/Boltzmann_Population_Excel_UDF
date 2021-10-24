@@ -5,21 +5,18 @@ Function Boltzmann_Pop(input_range As Range, Optional temperature, Optional unit
     End If
     
     If IsMissing(units) Then
-        kB = 0.0000031668 'For energies in Hartree (a.u.)
-        Else
-        
+            kB = 3.16681156345561E-06 'For energies in Hartree (a.u.)
+    Else
         Select Case units
-    Case "Hartree", "hartree", "Hartrees", "hartrees", "Eh", "eh", "au", "a.u."
-        kB = 0.0000031668
-    Case "kJ/mol", "kj/mol", "kj\mol", "kJ\mol", "kjmol", "KJ/mol"
-        kB = 0.008314463 
-    Case "kcal/mol", "Kcal/mol", "kcalmol", "kcal\mol", "Kcal\mol"
-        kB = 0.001985875
-     Case "ev", "eV", "EV"
-        kB = 0.00008617333262
-    
-End Select
-        
+            Case "Hartree", "hartree", "Hartrees", "hartrees", "Eh", "eh", "au", "a.u."
+                kB = 3.16681156345561E-06
+            Case "kJ/mol", "kj/mol", "kj\mol", "kJ\mol", "kjmol", "KJ/mol"
+                kB = 8.31446261815324E-03
+            Case "kcal/mol", "Kcal/mol", "kcalmol", "kcal\mol", "Kcal\mol"
+                kB = 1.98720425864083E-03
+             Case "ev", "eV", "EV"
+                kB = 8.61733326214518E-05
+        End Select
     End If
 
 ' Useful aliases
@@ -34,15 +31,13 @@ End Select
     n_rows = last_row - input_range.Cells(1).Row
     n_rcolumns = last_column - input_range.Cells(1).Column
  
-
- Dim Rel_En() As Variant       'Relative energies matrix; prevents overflow in the next stages, involving logarithms
+ Dim Rel_En() As Variant       'Relative energies matrix; prevents overflow in the next stages, that involve exponentials
  ReDim Rel_En(n_rows, n_rcolumns)
  For i = 0 To n_rcolumns
     For j = 0 To n_rows
         Rel_En(j, i) = Cells(input_range.Cells(1).Row + j, input_range.Cells(1).Column + i) - MinEnergy
     Next j
  Next i
- 
  
  Factors_Sum = 0
  Dim Boltz_Factors() As Variant       'Boltzmann factors matrix (f(i) = exp(-E(i)/(K*T))
@@ -60,7 +55,6 @@ End Select
     Next j
  Next i
  
- 
   For i = 0 To n_rcolumns
     For j = 0 To n_rows
            If (i <> 0 Or j <> 0) Then  'edits non-caller cells
@@ -72,8 +66,6 @@ End Select
         End If
     Next j
  Next i
- 
-
  
 End Function
 
