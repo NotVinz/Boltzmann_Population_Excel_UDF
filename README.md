@@ -60,7 +60,7 @@ We see that at 3000 K, only 36% of butane molecules are in Anti conformation, an
 
 
 ## Some notes
-As you can easily guess from the source code, the main user-specified options are regarding the energy units.
+As you can easily guess from the [source code](Boltzmann_Pop_Source.txt), the main user-specified options are regarding the energy units.
 A bit of typing freedom is tolerated:
 - The keywords  "Hartree", "hartree", "Hartrees", "hartrees", "Eh", "eh", "au", "a.u." **set units to Hartrees**
 - "kJ/mol", "kj/mol", "kj\mol", "kJ\mol", "kjmol", "KJ/mol" **set units to kJ/mol** 
